@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { Search, Filter, Download, RefreshCw } from 'lucide-react';
 import { Order } from '@/types/order-types';
 import { mockOrders } from '@/database/data';
-import { OrderTable } from '@/components/dashboard/OrderTable';
+import { OrderTable } from '@/components/all-orders/OrderTable';
 import { OrderDetailModal } from '@/components/dashboard/OrderDetailModel';
 
 export default function AllOrdersPage() {
