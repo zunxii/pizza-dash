@@ -18,5 +18,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/", "/all-orders"], 
+   matcher: ["/((?!login|_next|favicon.ico|images|api).*)"],
 };
