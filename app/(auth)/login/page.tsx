@@ -13,22 +13,13 @@ const Login: React.FC = () => {
   const handleGoogleAuth = async () => {
     try {
       setIsGoogleLoading(true);
-      
-      const result = await signIn('google', {
-        redirect: false,
-        callbackUrl: '/'
+      await signIn('google', {
+        callbackUrl: '/',
+        redirect: true  
       });
-
-      if (result?.error) {
-        console.error('Google sign-in error:', result.error);
-        alert('Authentication failed. Please try again.');
-      } else if (result?.ok) {
-        router.push('/');
-      }
     } catch (error) {
       console.error('Google authentication error:', error);
       alert('Authentication failed. Please try again.');
-    } finally {
       setIsGoogleLoading(false);
     }
   };
@@ -110,11 +101,11 @@ const Login: React.FC = () => {
                     <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                     <span className="text-sm text-gray-600">Inventory and staff management</span>
                   </div>
-                          <div className="text-center mt-6 p-4 bg-white/60 backdrop-blur-sm rounded-lg">
-          <p className="text-xs text-gray-500">
-            🔒 Secure authentication powered by Google OAuth
-          </p>
-        </div>
+                  <div className="text-center mt-6 p-4 bg-white/60 backdrop-blur-sm rounded-lg">
+                    <p className="text-xs text-gray-500">
+                      🔒 Secure authentication powered by Google OAuth
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
