@@ -1,5 +1,8 @@
 'use client'
 import { useState, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { Search, Filter, Download, RefreshCw } from 'lucide-react';
 import { Order } from '@/types/order-types';
 import { mockOrders } from '@/database/data';
@@ -9,11 +12,20 @@ import { PageHeader } from '@/components/all-orders/PageHeader';
 import { OrderFilters } from '@/components/all-orders/OrderFilters';
 
 export default function AllOrdersPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'date' | 'price' | 'status'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  useEffect(() => {
+    if (status === 'loading') return; // Still loading
+    if (!session) {
+      router.push('/login');
+    }
+  }, [session, status, router]);
 
   const filteredAndSortedOrders = useMemo(() => {
     let filtered = mockOrders.filter(order => {
@@ -46,6 +58,20 @@ export default function AllOrdersPage() {
 
     return filtered;
   }, [searchTerm, statusFilter, sortBy, sortOrder]);
+
+  // Show loading while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated (will redirect)
+  if (!session) {
+    return null;
+  }
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },

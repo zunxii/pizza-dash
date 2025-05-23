@@ -1,6 +1,9 @@
 'use client'
 
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { Package, DollarSign, Star, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { Order } from '@/types/order-types';
@@ -10,7 +13,30 @@ import { OrderCard } from '@/components/dashboard/OrderCard';
 import { OrderDetailModal } from '@/components/dashboard/OrderDetailModel';
 
 export default function DashboardPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+  useEffect(() => {
+    if (status === 'loading') return; // Still loading
+    if (!session) {
+      router.push('/login');
+    }
+  }, [session, status, router]);
+
+  // Show loading while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated (will redirect)
+  if (!session) {
+    return null;
+  }
 
   const recentOrders = mockOrders.slice(0, 3); // Show only first 3 orders
 
