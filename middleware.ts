@@ -29,6 +29,6 @@ export const config = {
      * - login (login page)
      * - Any file with an extension (like .png, .jpg, etc.)
      */
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|login|.*\\.).*)
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|login|.*\\.).*)'
   ]
 }
