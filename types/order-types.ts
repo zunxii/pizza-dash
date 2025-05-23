@@ -11,4 +11,5 @@ export interface Order {
   estimatedTime?: string;
   priority: 'high' | 'medium' | 'low';
   satisfaction: number;
+  orderTime : string;
 }

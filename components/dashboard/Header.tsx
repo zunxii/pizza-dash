@@ -1,17 +1,29 @@
-import { HeaderProps } from "@/types/props";
-import { Bell, Package, Pizza, Search, Users } from "lucide-react";
+import { Bell, Pizza, Search } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+interface HeaderProps {
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  currentTime: Date;
+}
 
 export const Header: React.FC<HeaderProps> = ({ 
   searchTerm, 
   onSearchChange, 
-  currentTime, 
-  viewMode, 
-  onViewModeChange 
+  currentTime
 }) => {
+  const pathname = usePathname();
+  
   const notifications = [
     { id: 1, message: "New order PZA007 received", type: "info", time: "2 min ago" },
     { id: 2, message: "PZA002 delivered successfully", type: "success", time: "5 min ago" },
     { id: 3, message: "High priority order PZA001", type: "warning", time: "8 min ago" }
+  ];
+
+  const navItems = [
+    { href: "/", label: "Dashboard", active: pathname === "/" },
+    { href: "/all-orders", label: "All Orders", active: pathname === "/all-orders" }
   ];
 
   return (
@@ -33,26 +45,22 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
 
-            {/* View Mode Toggle */}
-            <div className="flex items-center space-x-2 bg-orange-100/50 rounded-lg p-1">
-              {[
-                { mode: 'cards', icon: <Package className="w-4 h-4" />, label: 'Cards' },
-                { mode: 'table', icon: <Users className="w-4 h-4" />, label: 'All orders' }
-              ].map(({ mode, icon, label }) => (
-                <button
-                  key={mode}
-                  onClick={() => onViewModeChange(mode as 'cards' | 'table')}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                    viewMode === mode
+            {/* Navigation */}
+            <nav className="flex items-center space-x-2 bg-orange-100/50 rounded-lg p-1">
+              {navItems.map(({ href, label, active }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                    active
                       ? 'bg-white shadow-lg text-orange-600'
-                      : 'text-orange-600/70 hover:text-orange-600'
+                      : 'text-orange-600/70 hover:text-orange-600 hover:bg-white/50'
                   }`}
                 >
-                  {icon}
-                  <span className="text-sm font-medium">{label}</span>
-                </button>
+                  {label}
+                </Link>
               ))}
-            </div>
+            </nav>
           </div>
 
           {/* Search and Notifications */}
