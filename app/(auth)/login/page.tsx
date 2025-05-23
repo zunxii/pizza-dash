@@ -14,7 +14,7 @@ const Login: React.FC = () => {
     try {
       setIsGoogleLoading(true);
       await signIn('google', {
-        callbackUrl: '/',
+        callbackUrl: 'https://pizza-day-three.vercel.app/',
         redirect: true  
       });
     } catch (error) {
