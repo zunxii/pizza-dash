@@ -1,11 +1,12 @@
 'use client'
-
 import { useState, useMemo } from 'react';
 import { Search, Filter, Download, RefreshCw } from 'lucide-react';
 import { Order } from '@/types/order-types';
 import { mockOrders } from '@/database/data';
 import { OrderTable } from '@/components/all-orders/OrderTable';
 import { OrderDetailModal } from '@/components/dashboard/OrderDetailModel';
+import { PageHeader } from '@/components/all-orders/PageHeader';
+import { OrderFilters } from '@/components/all-orders/OrderFilters';
 
 export default function AllOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -24,8 +25,7 @@ export default function AllOrdersPage() {
       
       return matchesSearch && matchesStatus;
     });
-
-    // Sort orders
+    
     filtered.sort((a, b) => {
       let comparison = 0;
       
@@ -81,83 +81,18 @@ export default function AllOrdersPage() {
 
   return (
     <>
-      {/* Page Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">All Orders</h1>
-            <p className="text-gray-600 mt-1">
-              Manage and track all pizza orders ({filteredAndSortedOrders.length} orders)
-            </p>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={handleExport}
-              className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              <span>Export</span>
-            </button>
-            
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-              <RefreshCw className="w-4 h-4" />
-              <span>Refresh</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Filters and Search */}
-        <div className="flex flex-col sm:flex-row gap-4 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-orange-200/50">
-          {/* Search */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search by customer, pizza type, or order ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400"
-            />
-          </div>
-
-          {/* Status Filter */}
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="pl-10 pr-8 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 bg-white"
-            >
-              {statusOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Sort Controls */}
-          <div className="flex items-center space-x-2">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'date' | 'price' | 'status')}
-              className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 bg-white"
-            >
-              <option value="date">Sort by Date</option>
-              <option value="price">Sort by Price</option>
-              <option value="status">Sort by Status</option>
-            </select>
-            
-            <button
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-              title={`Sort ${sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
-            >
-              {sortOrder === 'asc' ? '↑' : '↓'}
-            </button>
-          </div>
-        </div>
+      <div className="mb-6">
+        <PageHeader onExport={handleExport}/>
+        <OrderFilters
+          searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        sortOrder={sortOrder}
+        onSortOrderChange={setSortOrder}
+        />
       </div>
 
       {/* Orders Table */}

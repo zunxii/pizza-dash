@@ -32,8 +32,9 @@ export const Header: React.FC<HeaderProps> = ({
                 <Pizza className="w-7 h-7 text-white" />
               </div>
               <div>
+                <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">Welcome ,</h3>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                  Welcome{session?.user?.name ? `, ${session.user.name}` : " Back"}!
+                  {session?.user?.name ? ` ${session.user.name}` : " Back"}!
                 </h1>
                 <p className="text-sm text-orange-600/70">
                   {currentTime.toLocaleString()}

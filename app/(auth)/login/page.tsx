@@ -16,14 +16,14 @@ const Login: React.FC = () => {
       
       const result = await signIn('google', {
         redirect: false,
-        callbackUrl: '/dashboard'
+        callbackUrl: '/'
       });
 
       if (result?.error) {
         console.error('Google sign-in error:', result.error);
         alert('Authentication failed. Please try again.');
       } else if (result?.ok) {
-        router.push('/dashboard');
+        router.push('/');
       }
     } catch (error) {
       console.error('Google authentication error:', error);

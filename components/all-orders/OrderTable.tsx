@@ -124,7 +124,6 @@ export const OrderTable: React.FC<OrderTableProps> = ({ orders, onOrderClick }) 
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Handle more actions
                       }}
                       className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                     >
