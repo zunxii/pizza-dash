@@ -7,13 +7,8 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token, req }) => {
-        if (token) return true;
-        if (req.nextUrl.pathname === "/") {
-          return false;
-        }
-        
-        return false;
+      authorized: ({ token }) => {
+        return !!token; 
       },
     },
     pages: {
@@ -23,5 +18,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/", "/all-orders"],
+  matcher: ["/", "/all-orders"], 
 };
