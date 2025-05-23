@@ -1,103 +1,143 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import {   Search,   Clock,   CheckCircle,   XCircle,   ChefHat,  Pizza,  Phone,  MapPin,  Users,  Package,  DollarSign,  Bell,  Star,  X,  MessageSquare,  Edit,  Eye,  Activity,  Target,  ArrowUp,RefreshCw,MoreVertical} from 'lucide-react';
+import { Order } from '@/types/order-types';
+import { mockOrders } from '@/database/data';
+import { Header } from '@/components/dashboard/Header';
+import { StatCard } from '@/components/dashboard/Statcard';
+import { OrderTable } from '@/components/dashboard/OrderTable';
+import { OrderCard } from '@/components/dashboard/OrderCard';
+import { OrderDetailModal } from '@/components/dashboard/OrderDetailModel';
+
+const PizzaDashboard = () => {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const filteredOrders = mockOrders.filter(order =>
+    order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.pizzaType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const stats = {
+    totalOrders: mockOrders.length,
+    pendingOrders: mockOrders.filter(o => o.status === 'Pending').length,
+    preparingOrders: mockOrders.filter(o => o.status === 'Preparing').length,
+    outForDelivery: mockOrders.filter(o => o.status === 'Out for Delivery').length,
+    deliveredOrders: mockOrders.filter(o => o.status === 'Delivered').length,
+    totalRevenue: mockOrders.reduce((sum, order) => sum + order.price, 0),
+    avgSatisfaction: mockOrders.reduce((sum, order) => sum + order.satisfaction, 0) / mockOrders.length
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50">
+      <Header
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        currentTime={currentTime}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+      />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatCard
+            label="Total Orders"
+            value={stats.totalOrders}
+            icon={<Package className="w-6 h-6" />}
+            color="from-blue-500 to-indigo-600"
+            trend="+12%"
+          />
+          <StatCard
+            label="Active Orders"
+            value={stats.pendingOrders + stats.preparingOrders + stats.outForDelivery}
+            icon={<Activity className="w-6 h-6" />}
+            color="from-orange-500 to-red-600"
+            trend="+8%"
+          />
+          <StatCard
+            label="Revenue"
+            value={`${stats.totalRevenue.toFixed(2)}`}
+            icon={<DollarSign className="w-6 h-6" />}
+            color="from-green-500 to-emerald-600"
+            trend="+15%"
+          />
+          <StatCard
+            label="Avg Rating"
+            value={stats.avgSatisfaction.toFixed(1)}
+            icon={<Star className="w-6 h-6" />}
+            color="from-yellow-500 to-orange-500"
+            trend="+5%"
+          />
         </div>
+
+        {/* Orders Section */}
+        <div className="mb-6 flex gap-10">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Recent Orders ({filteredOrders.length})
+          </h2>
+            {filteredOrders.length > 3 && (
+    <button
+      onClick={() => setViewMode('table')}
+      className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg shadow"
+    >
+      See All Orders
+    </button>
+)}
+        </div>
+
+        {/* Orders Display */}
+        {viewMode === 'cards' ? (
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredOrders.slice(0, 3).map((order) => (
+  <OrderCard
+    key={order.id}
+    order={order}
+    onClick={() => setSelectedOrder(order)}
+    isSelected={selectedOrder?.id === order.id}
+  />
+))}
+          </div>
+        ) : (
+          <OrderTable
+            orders={filteredOrders}
+            onOrderClick={setSelectedOrder}
+          />
+        )}
+
+        {/* No results */}
+        {filteredOrders.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Search className="w-12 h-12 text-orange-500" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No orders found</h3>
+            <p className="text-gray-600">Try adjusting your search criteria</p>
+          </div>
+        )}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+      {/* Order Detail Modal */}
+      {selectedOrder && (
+        <OrderDetailModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
+      )}
     </div>
   );
-}
+};
+
+export default PizzaDashboard;
